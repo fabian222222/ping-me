@@ -64,4 +64,14 @@ export class AuthService {
     const { password: _, ...result } = user;
     return result;
   }
+
+  async getProfile(id: string): Promise<UserWithoutPassword> {
+    const user = await this.usersService.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...result } = user;
+    return result;
+  }
 }

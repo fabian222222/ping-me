@@ -11,15 +11,18 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { User } from '@prisma/client';
+import { UsersService } from '../users/users.service';
 
 interface RequestWithUser extends Request {
-  user: User;
+  user: { userId: string };
 }
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -36,7 +39,9 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: RequestWithUser): UserWithoutPassword {
-    return req.user;
+  async getProfile(
+    @Request() req: RequestWithUser,
+  ): Promise<UserWithoutPassword> {
+    return this.authService.getProfile(req.user.userId);
   }
 }
