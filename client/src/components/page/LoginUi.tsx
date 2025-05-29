@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import LoginForm from "../login/LoginForm";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 const LoginUi = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+    const { login } = useAuthContext();
     const { toast } = useToast();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -18,7 +18,7 @@ const LoginUi = () => {
         if (!email || !password) {
             toast({
                 title: "Error",
-                description: "Please fill in all fields",
+                description: "Veuillez remplir tous les champs",
                 variant: "destructive",
             });
             return;
@@ -26,21 +26,20 @@ const LoginUi = () => {
 
         setIsLoading(true);
 
-        // Mock login - will be replaced with actual authentication
         try {
-            // Simulating API request
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            // For demo purposes - always succeeds
-            toast({
-                title: "Success",
-                description: "Welcome back!",
+            await login({
+                email,
+                password,
             });
-            router.push("/chat");
+
+            toast({
+                title: "Succès",
+                description: "Connexion réussie !",
+            });
         } catch (error) {
             toast({
-                title: "Error",
-                description: "Failed to login. Please try again.",
+                title: "Erreur",
+                description: "Échec de la connexion. Veuillez réessayer.",
                 variant: "destructive",
             });
         } finally {
