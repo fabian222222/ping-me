@@ -1,6 +1,5 @@
-export interface User {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-}
+import { AuthResponse } from "./auth";
+
+export type User = AuthResponse["user"];
+export type UserWithoutPassword = Omit<User, "password">;
+export type UserAvatar = Pick<User, "firstName" | "lastName" | "email">;

@@ -1,8 +1,17 @@
+"use client";
 import { useState, useCallback } from "react";
 import { getProfile, login, refreshToken } from "@/services/auth.service";
 import { LoginCredentials, AuthState } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { setToken, getToken, removeToken, isAuthenticated } from "@/lib/utils";
+import { updateUser as updateUserService } from "@/services/users.service";
+
+interface UpdateUserData {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+}
 
 export const useAuth = () => {
     const router = useRouter();
@@ -17,11 +26,18 @@ export const useAuth = () => {
             try {
                 const response = await login(credentials);
                 setToken(response.access_token);
-                setAuthState({
-                    user: response.user,
-                    token: response.access_token,
-                    isAuthenticated: true,
+
+                const userProfile = await getProfile(response.access_token);
+
+                await new Promise<void>((resolve) => {
+                    setAuthState({
+                        user: userProfile,
+                        token: response.access_token,
+                        isAuthenticated: true,
+                    });
+                    resolve();
                 });
+
                 router.push("/");
                 return response;
             } catch (error) {
@@ -41,6 +57,19 @@ export const useAuth = () => {
         });
         router.push("/login");
     }, [router]);
+
+    const handleUpdateUser = useCallback(async (data: UpdateUserData) => {
+        try {
+            const updatedUser = await updateUserService(data);
+            setAuthState((prev) => ({
+                ...prev,
+                user: updatedUser,
+            }));
+        } catch (error) {
+            console.error("Update user error:", error);
+            throw error;
+        }
+    }, []);
 
     const loadUser = useCallback(async () => {
         const token = getToken();
@@ -74,5 +103,6 @@ export const useAuth = () => {
         login: handleLogin,
         logout: handleLogout,
         loadUser,
+        updateUser: handleUpdateUser,
     };
 };

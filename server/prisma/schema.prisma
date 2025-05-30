@@ -17,7 +17,8 @@ model User {
   id                String     @id @default(cuid())
   email             String     @unique
   password          String?
-  name              String?
+  firstName         String
+  lastName          String
   username          String     @unique
   bio               String?
   avatar            String?
@@ -36,6 +37,10 @@ model User {
   sentMessages      Message[]   @relation("SentMessages")
   receivedMessages  Message[]   @relation("ReceivedMessages")
   groups            GroupUser[]
+  sentFriendRequests     FriendRequest[] @relation("SentFriendRequests")
+  receivedFriendRequests FriendRequest[] @relation("ReceivedFriendRequests")
+  friends               User[]          @relation("UserFriends")
+  friendsOf            User[]          @relation("UserFriends")
 }
 
 enum UserStatus {
@@ -71,4 +76,25 @@ model GroupUser {
   joinedAt  DateTime @default(now())
 
   @@id([userId, groupId])
+}
+
+model FriendRequest {
+  id          String       @id @default(cuid())
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  senderId    String
+  sender      User         @relation("SentFriendRequests", fields: [senderId], references: [id])
+  
+  receiverId  String
+  receiver    User         @relation("ReceivedFriendRequests", fields: [receiverId], references: [id])
+
+  @@unique([senderId, receiverId])
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }

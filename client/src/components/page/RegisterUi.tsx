@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import RegisterForm from "../register/RegisterForm";
 import { RegisterFormData, registerSchema } from "@/schemas/auth.schema";
-import { createUser } from "@/services/users";
+import { createUser } from "@/services/users.service";
 
 const RegisterUi = () => {
     const {

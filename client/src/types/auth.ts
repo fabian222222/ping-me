@@ -6,10 +6,31 @@ export interface LoginCredentials {
 export interface AuthResponse {
     access_token: string;
     user: {
-        id: string;
+        avatar?: string;
+        bio?: string;
+        createdAt: string;
+        discordId?: string;
         email: string;
-        name?: string;
+        emailVerified: false;
+        firstName: string;
+        githubId?: string;
+        googleId?: string;
+        id: string;
+        lastName: string;
+        resetToken?: string;
+        resetTokenExpiry?: string;
+        status: UserStatus;
+        twoFactorEnabled: false;
+        twoFactorSecret?: string;
+        updatedAt: string;
+        username: string;
+        verificationToken?: string;
     };
+}
+
+export enum UserStatus {
+    OFFLINE = "OFFLINE",
+    ONLINE = "ONLINE",
 }
 
 export interface AuthState {
