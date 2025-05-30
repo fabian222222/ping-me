@@ -44,6 +44,7 @@ export const updateUser = async (data: {
     lastName: string;
     username: string;
     email: string;
+    messageColor?: string;
 }): Promise<AuthResponse["user"]> => {
     try {
         const response = await axiosInstance.put(`/users`, data);

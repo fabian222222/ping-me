@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -28,6 +27,7 @@ const userSettingsSchema = z.object({
         .string()
         .min(2, "Le prénom doit contenir au moins 2 caractères"),
     lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+    messageColor: z.string(),
 });
 
 type UserSettingsFormData = z.infer<typeof userSettingsSchema>;
@@ -46,6 +46,8 @@ export default function UserSettingsDialog({
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
+        setValue,
+        watch,
     } = useForm<UserSettingsFormData>({
         resolver: zodResolver(userSettingsSchema),
         defaultValues: {
@@ -53,8 +55,15 @@ export default function UserSettingsDialog({
             email: user?.email || "",
             firstName: user?.firstName || "",
             lastName: user?.lastName || "",
+            messageColor: user?.messageColor || "#171717",
         },
     });
+
+    const messageColor = watch("messageColor");
+
+    const handleColorChange = (value: string) => {
+        setValue("messageColor", value, { shouldValidate: true });
+    };
 
     const onSubmit = async (data: UserSettingsFormData) => {
         try {
@@ -63,6 +72,7 @@ export default function UserSettingsDialog({
                 lastName: data.lastName,
                 username: data.name,
                 email: data.email,
+                messageColor: data.messageColor,
             });
 
             updateUser(updatedUser);
@@ -116,6 +126,7 @@ export default function UserSettingsDialog({
                                     }
                                 }
                                 className="h-16 w-16"
+                                status={user?.status || "OFFLINE"}
                             />
                         </div>
                         <div className="grid gap-2">
@@ -178,6 +189,32 @@ export default function UserSettingsDialog({
                                     {errors.email.message}
                                 </p>
                             )}
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="messageColor">
+                                Couleur des messages
+                            </Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    id="messageColor-picker"
+                                    type="color"
+                                    value={messageColor}
+                                    onChange={(e) =>
+                                        handleColorChange(e.target.value)
+                                    }
+                                    className="h-10 w-20 p-1"
+                                />
+                                <Input
+                                    id="messageColor"
+                                    type="text"
+                                    value={messageColor}
+                                    onChange={(e) =>
+                                        handleColorChange(e.target.value)
+                                    }
+                                    className="flex-1"
+                                    placeholder="#171717"
+                                />
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

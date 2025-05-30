@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { UserAvatar as UserAvatarType } from "@/types/user";

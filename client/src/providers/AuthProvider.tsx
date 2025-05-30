@@ -9,6 +9,7 @@ interface UpdateUserData {
     lastName: string;
     username: string;
     email: string;
+    messageColor?: string;
 }
 
 interface AuthContextType extends AuthState {

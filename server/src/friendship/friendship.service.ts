@@ -6,10 +6,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { RequestStatus } from '@prisma/client';
 import { SendFriendRequestDto } from './dto/send-friend-request.dto';
+import { FriendshipGateway } from '../gateways/friendship.gateway';
 
 @Injectable()
 export class FriendshipService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private friendshipGateway: FriendshipGateway,
+  ) {}
 
   private async findUserByIdentifier(identifier: string) {
     const user = await this.prisma.user.findFirst({
@@ -51,13 +55,20 @@ export class FriendshipService {
       throw new BadRequestException("Une demande d'ami existe déjà");
     }
 
-    return this.prisma.friendRequest.create({
+    const request = await this.prisma.friendRequest.create({
       data: {
         senderId,
         receiverId,
         status: RequestStatus.PENDING,
       },
       include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
         receiver: {
           select: {
             id: true,
@@ -67,11 +78,31 @@ export class FriendshipService {
         },
       },
     });
+
+    this.friendshipGateway.sendFriendRequest(receiverId, 'addFriend', request);
+
+    return request;
   }
 
   async acceptFriendRequest(userId: string, requestId: string) {
     const request = await this.prisma.friendRequest.findUnique({
       where: { id: requestId },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
     });
 
     if (!request) {
@@ -88,9 +119,25 @@ export class FriendshipService {
       throw new BadRequestException('Cette demande a déjà été traitée');
     }
 
-    await this.prisma.friendRequest.update({
+    const updatedRequest = await this.prisma.friendRequest.update({
       where: { id: requestId },
       data: { status: RequestStatus.ACCEPTED },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
     });
 
     await this.prisma.$transaction([
@@ -112,12 +159,28 @@ export class FriendshipService {
       }),
     ]);
 
-    return { message: "Demande d'ami acceptée" };
+    return { message: "Demande d'ami acceptée", request: updatedRequest };
   }
 
   async rejectFriendRequest(userId: string, requestId: string) {
     const request = await this.prisma.friendRequest.findUnique({
       where: { id: requestId },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
     });
 
     if (!request) {
@@ -134,10 +197,28 @@ export class FriendshipService {
       throw new BadRequestException('Cette demande a déjà été traitée');
     }
 
-    return this.prisma.friendRequest.update({
+    const updatedRequest = await this.prisma.friendRequest.update({
       where: { id: requestId },
       data: { status: RequestStatus.REJECTED },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
     });
+
+    return updatedRequest;
   }
 
   async getPendingRequests(userId: string) {

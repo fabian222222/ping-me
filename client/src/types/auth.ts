@@ -17,6 +17,7 @@ export interface AuthResponse {
         googleId?: string;
         id: string;
         lastName: string;
+        messageColor: string;
         resetToken?: string;
         resetTokenExpiry?: string;
         status: UserStatus;

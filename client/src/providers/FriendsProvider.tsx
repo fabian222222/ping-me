@@ -23,6 +23,7 @@ interface FriendsContextType {
     sendFriendRequest: (receiverId: string) => Promise<void>;
     acceptFriendRequest: (requestId: string) => Promise<void>;
     rejectFriendRequest: (requestId: string) => Promise<void>;
+    setPendingRequests: (requests: FriendRequest[]) => void;
 }
 
 const FriendsContext = createContext<FriendsContextType | undefined>(undefined);
@@ -30,7 +31,6 @@ const FriendsContext = createContext<FriendsContextType | undefined>(undefined);
 export const FriendsProvider = ({ children }: { children: ReactNode }) => {
     const [friends, setFriends] = useState<Friend[]>([]);
     const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
-
     const loadFriends = useCallback(async () => {
         try {
             const friendsList = await getFriends();
@@ -96,6 +96,7 @@ export const FriendsProvider = ({ children }: { children: ReactNode }) => {
         sendFriendRequest,
         acceptFriendRequest,
         rejectFriendRequest,
+        setPendingRequests,
     };
 
     return (

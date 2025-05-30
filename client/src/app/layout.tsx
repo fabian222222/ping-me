@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuthContext } from "@/providers/AuthProvider";
 import Sidebar from "@/components/common/Sidebar";
 import { FriendsProvider } from "@/providers/FriendsProvider";
+import { MessagesProvider } from "@/providers/MessagesProvider";
+import { SocketProvider } from "@/providers/SocketProvider";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -42,10 +44,14 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable}`}>
                 <AuthProvider>
-                    <FriendsProvider>
-                        <Toaster />
-                        <MainContent>{children}</MainContent>
-                    </FriendsProvider>
+                    <MessagesProvider>
+                        <FriendsProvider>
+                            <SocketProvider>
+                                <Toaster />
+                                <MainContent>{children}</MainContent>
+                            </SocketProvider>
+                        </FriendsProvider>
+                    </MessagesProvider>
                 </AuthProvider>
             </body>
         </html>

@@ -4,7 +4,10 @@ import React from "react";
 import { Friend } from "@/services/friends.service";
 import UserAvatar from "./UserAvatar";
 
-export const FriendsList: React.FC<{ friends: Friend[] }> = ({ friends }) => {
+export const FriendsList: React.FC<{
+    friends: Friend[];
+    onFriendClick: (friendId: string) => void;
+}> = ({ friends, onFriendClick }) => {
     const getStatusText = (status: "ONLINE" | "OFFLINE" | "INVISIBLE") => {
         const statusTexts = {
             ONLINE: "En ligne",
@@ -24,6 +27,7 @@ export const FriendsList: React.FC<{ friends: Friend[] }> = ({ friends }) => {
                     <div
                         key={friend.id}
                         className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-lg cursor-pointer"
+                        onClick={() => onFriendClick(friend.id)}
                     >
                         <UserAvatar
                             user={friend}

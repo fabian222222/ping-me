@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -12,35 +21,42 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  create(@Body() createMessageDto: CreateMessageDto, @CurrentUser() user: User) {
-    return this.messagesService.create(createMessageDto);
+  create(
+    @Body() createMessageDto: CreateMessageDto,
+    @CurrentUser() user: { userId: string },
+  ) {
+    return this.messagesService.create(createMessageDto, user);
   }
 
   @Get()
-  findAll() {
-    return this.messagesService.findAll();
+  findAll(@CurrentUser() user: { userId: string }) {
+    return this.messagesService.findAll(user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messagesService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() user: { userId: string }) {
+    return this.messagesService.findOne(id, user);
   }
 
   @Get('user/:userId')
-  findByUser(@Param('userId') userId: string) {
-    return this.messagesService.findByUser(userId);
+  findByUser(
+    @Param('userId') userId: string,
+    @CurrentUser() user: { userId: string },
+  ) {
+    return this.messagesService.findByUser(userId, user);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateMessageDto: UpdateMessageDto,
+    @CurrentUser() user: { userId: string },
   ) {
-    return this.messagesService.update(id, updateMessageDto);
+    return this.messagesService.update(id, updateMessageDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messagesService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: { userId: string }) {
+    return this.messagesService.remove(id, user);
   }
-} 
+}

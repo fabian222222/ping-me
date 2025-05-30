@@ -11,6 +11,7 @@ import { UserAvatar as UserAvatarType } from "@/types/user";
 import { FriendsList } from "./FriendsList";
 import { useEffect } from "react";
 import { useFriends } from "@/providers/FriendsProvider";
+import { useMessages } from "@/providers/MessagesProvider";
 
 interface SidebarProps {
     onLogout: () => void;
@@ -19,6 +20,7 @@ interface SidebarProps {
 const Sidebar = ({ onLogout }: SidebarProps) => {
     const { user, updateUser } = useAuthContext();
     const { friends, loadFriends } = useFriends();
+    const { setUserSelected } = useMessages();
 
     const adaptedUser: UserAvatarType = {
         email: user?.email || "",
@@ -68,7 +70,10 @@ const Sidebar = ({ onLogout }: SidebarProps) => {
                         <AddFriendDialog />
                     </div>
 
-                    <FriendsList friends={friends} />
+                    <FriendsList
+                        friends={friends}
+                        onFriendClick={setUserSelected}
+                    />
                 </div>
             </div>
             <div className="p-4 border-t">

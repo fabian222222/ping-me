@@ -3,10 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersGateway } from '../gateways/users.gateway';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private usersGateway: UsersGateway,
+  ) {}
 
   async findByEmail(email: string): Promise<User | null> {
     return await this.prisma.user.findUnique({
@@ -33,10 +37,17 @@ export class UsersService {
     }
 
     const data = { ...updateUserDto };
-
-    return await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data,
     });
+
+    if (updateUserDto.messageColor) {
+      this.usersGateway.broadcastUserUpdate(id, {
+        messageColor: updateUserDto.messageColor,
+      });
+    }
+
+    return updatedUser;
   }
 }

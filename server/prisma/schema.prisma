@@ -23,6 +23,7 @@ model User {
   bio               String?
   avatar            String?
   status            UserStatus @default(OFFLINE)
+  messageColor      String     @default("#171717")
   emailVerified     Boolean    @default(false)
   verificationToken String?
   resetToken        String?
